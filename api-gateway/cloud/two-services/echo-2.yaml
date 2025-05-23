@@ -20,7 +20,7 @@ spec:
   - port: 8090
     name: high
     protocol: TCP
-    targetPort: 8080
+    targetPort: 8090
   selector:
     app: echo-2
 ---
@@ -50,7 +50,7 @@ spec:
     spec:
       serviceAccountName: echo-2
       containers:
-      - image: gcr.io/kubernetes-e2e-test-images/echoserver:2.2
+      - image: kicbase/echo-server:1.0
         name: echo-2
         ports:
-        - containerPort: 8080
+        - containerPort: 8090
