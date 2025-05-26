@@ -22,7 +22,7 @@ spec:
   - port: 8080
     name: high
     protocol: TCP
-    targetPort: 3000
+    targetPort: 8080
   selector:
     app: echo-1
 ---
@@ -54,7 +54,7 @@ spec:
     spec:
       serviceAccountName: echo-1
       containers:
-      - image: k8s.gcr.io/ingressconformance/echoserver:v0.0.1
+      - image: kicbase/echo-server:1.0
         name: echo-1
         env:
         - name: SERVICE_NAME
@@ -68,4 +68,4 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         ports:
-        - containerPort: 3000
+        - containerPort: 8080

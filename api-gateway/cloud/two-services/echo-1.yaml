@@ -50,7 +50,7 @@ spec:
     spec:
       serviceAccountName: echo-1
       containers:
-      - image: gcr.io/kubernetes-e2e-test-images/echoserver:2.2
+      - image: kicbase/echo-server:1.0
         name: echo-1
         ports:
         - containerPort: 8080
