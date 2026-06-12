@@ -1,0 +1,64 @@
+global:
+  name: client
+  enabled: false
+  image: 'hashicorp/consul-enterprise:1.22.7-ent'
+  enableConsulNamespaces: true
+  # Must match consul-values-server.yaml
+  datacenter: dc1
+  enterpriseLicense:
+    secretName: 'consul-ent-license'
+    secretKey: 'key'
+  adminPartitions:
+    enabled: true
+    # The name of the admin partition for the client partition. This can be any value. An admin partition typically represents a single Consul Enterprise cluster on one Kubernetes cluster.
+    name: 'tereknor'
+  acls:
+    manageSystemACLs: true
+    bootstrapToken:
+      # Copy from server
+      secretName: server-partitions-acl-token
+      secretKey: token
+  logLevel: 'debug'
+  gossipEncryption:
+    # copy from server
+    secretName: server-gossip-encryption-key
+    secretKey: key
+  tls:
+    enabled: true
+    verify: false
+    enableAutoEncrypt: true
+    caKey:
+      secretName: server-ca-key
+      secretKey: tls.key
+    caCert:
+      secretName: server-ca-cert
+      secretKey: tls.crt
+externalServers:
+  enabled: true
+  hosts:
+    # The hostname of the admin-partition `LoadBalancer` service Running on the server cluster
+    - TODO
+  useSystemRoots: false
+  # The client cluster's hostname for the Kubernetes control plane. Obtained by running `kubectl --cluster-info` for that cluster.
+  k8sAuthMethodHost: TODO
+client:
+  enabled: true
+  join:
+    # The hostname of the admin-partition `LoadBalancer` service Running on the server cluster
+    - TODO
+connectInject:
+  enabled: true
+  aclBindingRuleSelector: ''
+  consulNamespaces:
+    mirroringK8S: true
+  transparentProxy:
+    defaultEnabled: true
+  centralConfig:
+    enabled: true
+controller:
+  enabled: true
+dns:
+  enabled: true
+  enableRedirection: true
+meshGateway:
+  enabled: true

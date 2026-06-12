@@ -46,20 +46,20 @@ spec:
     name: payments
     namespace: default
 
----
-apiVersion: consul.hashicorp.com/v1alpha1
-kind: ServiceIntentions
-metadata:
-  # The metadata name is the destination service name and
-  # matches the spec.destination.name value.
-  name: postgres
-  namespace: default
-spec:
-  sources:
-    - name: products-api
-      action: allow
-      partition: tereknor
-      namespace: default
-  destination:
-    name: postgres
-    namespace: default
+#---
+#apiVersion: consul.hashicorp.com/v1alpha1
+#kind: ServiceIntentions
+#metadata:
+#  # The metadata name is the destination service name and
+#  # matches the spec.destination.name value.
+#  name: postgres
+#  namespace: default
+#spec:
+#  sources:
+#    - name: products-api
+#      action: allow
+#      partition: tereknor
+#      namespace: default
+#  destination:
+#    name: postgres
+#    namespace: default
