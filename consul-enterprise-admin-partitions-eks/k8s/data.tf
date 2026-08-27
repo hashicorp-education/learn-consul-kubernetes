@@ -3,5 +3,9 @@
 
 data "aws_region" "current" {}
 data "aws_security_group" "eks_cluster" {
-  id = aws_eks_cluster.primary.vpc_config.0.cluster_security_group_id
+  id = aws_eks_cluster.eks-cluster.vpc_config.0.cluster_security_group_id
+}
+
+data "tls_certificate" "oidc" {
+  url = aws_eks_cluster.eks-cluster.identity[0].oidc[0].issuer
 }

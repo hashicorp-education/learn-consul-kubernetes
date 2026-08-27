@@ -35,7 +35,7 @@ metadata:
 data:
   config: |
     {
-      "db_connection": "host=localhost port=5432 user=postgres password=password dbname=products sslmode=disable",
+      "db_connection": "host=postgres.virtual.default.ns.default.ap.galaxy.dc.consul port=5432 user=postgres password=password dbname=products sslmode=disable",
       "bind_address": ":9090",
       "metrics_address": ":9103"
     }
@@ -59,9 +59,6 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/port: "9102"
         consul.hashicorp.com/connect-inject: "true"
-        #consul.hashicorp.com/connect-service-upstreams: "postgres.svc.default.ns.default.ap:5432" # this currently doesn't work
-        #consul.hashicorp.com/connect-service-upstreams: "postgres.default.default:5432" # this currently doesn't work
-        #consul.hashicorp.com/connect-service-upstreams: "postgres.service.consul:5432" # local deployment works
     spec:
       serviceAccountName: products-api
       volumes:

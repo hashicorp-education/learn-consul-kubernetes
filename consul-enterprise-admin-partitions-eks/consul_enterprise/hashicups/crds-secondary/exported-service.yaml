@@ -4,14 +4,14 @@
 apiVersion: consul.hashicorp.com/v1alpha1
 kind: ExportedServices
 metadata:
-  name: default
+  name: tereknor
 spec:
   services:
-  - name: postgres
+  - name: products-api
     namespace: default
     consumers:
-    - partition: tereknor
-  - name: server-mesh-gateway
+    - partition: default
+  - name: mesh-gateway
     namespace: default
     consumers:
-    - partition: tereknor
+    - partition: default

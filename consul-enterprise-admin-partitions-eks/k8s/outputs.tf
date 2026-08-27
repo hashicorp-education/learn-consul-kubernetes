@@ -11,7 +11,7 @@ output "main_route_table_id" {
   value = module.networking.main_route_table_id
 }
 output "security_group_id" {
-  value = aws_eks_cluster.primary.vpc_config.0.cluster_security_group_id
+  value = aws_eks_cluster.eks-cluster.vpc_config.0.cluster_security_group_id
 }
 
 output "public-subnet-id" {
