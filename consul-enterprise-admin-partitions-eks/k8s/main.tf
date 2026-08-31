@@ -9,23 +9,21 @@ terraform {
   }
 }
 
-data "tls_certificate" "oidc" {
-  url = aws_eks_cluster.primary.identity[0].oidc[0].issuer
-}
-
 # EKS addon
 resource "aws_eks_addon" "ebs_csi_driver" {
-  cluster_name             = aws_eks_cluster.primary.name
+  cluster_name             = var.eks_cluster_name
   addon_name               = "aws-ebs-csi-driver"
   addon_version            = "v1.60.1-eksbuild.1" #"v1.29.1-eksbuild.1"
   service_account_role_arn = aws_iam_role.ebs_csi_driver.arn
+  depends_on = [ aws_eks_cluster.eks-cluster ]
 }
 
 # AWS Identity and Access Management (IAM) OpenID Connect (OIDC) provider
 resource "aws_iam_openid_connect_provider" "eks" {
-  url             = aws_eks_cluster.primary.identity.0.oidc.0.issuer
+  url             = aws_eks_cluster.eks-cluster.identity.0.oidc.0.issuer
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = [data.tls_certificate.oidc.certificates[0].sha1_fingerprint]
+  #depends_on = [ aws_eks_cluster.eks-cluster ]
 }
 
 # IAM
@@ -77,7 +75,7 @@ module "networking" {
   availability_zones = var.availability_zones
 }
 
-resource "aws_eks_cluster" "primary" {
+resource "aws_eks_cluster" "eks-cluster" {
   name     = var.eks_cluster_name
   role_arn = module.iam.eks_admin_partition_arn
   vpc_config {
@@ -91,14 +89,14 @@ resource "aws_eks_cluster" "primary" {
 module "update_eks_cluster_sgs" {
   source = "./create-new-sg"
   vpc_id = module.networking.vpc_id
-  existing_sg_id = aws_eks_cluster.primary.vpc_config.0.cluster_security_group_id
+  existing_sg_id = aws_eks_cluster.eks-cluster.vpc_config.0.cluster_security_group_id
   cidr_blocks = [var.eks_vpc_cidr_block_primary.public, var.eks_vpc_cidr_block_primary.private, var.eks_vpc_cidr_block_secondary.private, var.eks_vpc_cidr_block_secondary.public]
-  depends_on = [aws_eks_cluster.primary]
+  depends_on = [aws_eks_cluster.eks-cluster]
 }
 
 resource "aws_eks_node_group" "public" {
   node_group_name_prefix = "ngPublic"
-  cluster_name  = aws_eks_cluster.primary.name
+  cluster_name  = aws_eks_cluster.eks-cluster.name
   node_role_arn = module.iam.eks_admin_partition_arn
   subnet_ids    = [module.networking.subnet_ids.public]
 
@@ -121,7 +119,7 @@ resource "aws_eks_node_group" "public" {
 
 resource "aws_eks_node_group" "private" {
   node_group_name_prefix = "ngPriv"
-  cluster_name  = aws_eks_cluster.primary.name
+  cluster_name  = aws_eks_cluster.eks-cluster.name
   node_role_arn = module.iam.eks_admin_partition_arn
   subnet_ids    = [module.networking.subnet_ids.private]
 
@@ -143,3 +141,30 @@ resource "aws_eks_node_group" "private" {
 
 
 
+/*
+resource "kubernetes_storage_class_v1" "ebs-sc" {
+  metadata {
+    name = "ebs-sc"
+  }
+
+  storage_provisioner = "kubernetes.io/aws-ebs"
+  volume_binding_mode = "WaitForFirstConsumer"
+  #reclaim_policy      = "Retain"
+  #mount_options = ["file_mode=0700", "dir_mode=0777", "mfsymlinks", "uid=1000", "gid=1000", "nobrl", "cache=none"]
+  parameters = {
+    fstype = "xfs"
+    type = "io1"
+    iopsPerGB = "50"
+    encrypted = "true"
+  }
+  depends_on = [ aws_eks_cluster.eks-cluster, aws_eks_addon.ebs_csi_driver ]
+}
+
+resource "kubernetes_namespace_v1" "consul" {
+  metadata {
+    name = "consul"
+  }
+
+  depends_on = [ aws_eks_cluster.eks-cluster ]
+}
+*/

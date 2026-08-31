@@ -11,3 +11,7 @@ spec:
     namespace: default
     consumers:
     - partition: tereknor
+  - name: mesh-gateway
+    namespace: default
+    consumers:
+    - partition: tereknor

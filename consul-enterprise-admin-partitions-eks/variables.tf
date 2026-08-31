@@ -15,6 +15,11 @@ variable "license_name" {
   type        = string
   description = "The name of the Consul Enterprise license file. Place this file in the `./consul_enterprise/` directory"
   default     = "consul.hclic"
+
+  validation {
+    condition     = fileexists(pathexpand("./consul_enterprise/${var.license_name}"))
+    error_message = "Consul Enterprise license file not found at ${var.license_name}. Please place the license file in the `./consul_enterprise/` directory."
+  }
 }
 
 # Default tags to pass to AWS. You can set them here, or in a tfvars file.
